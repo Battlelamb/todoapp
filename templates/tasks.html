@@ -1,21 +1,29 @@
-{#
-1- Task ismi
-2- Task durumu (Aktif, Bitmis, İptal)
-3- Task süresi
-4- Task başlangıç
-5- Task bitiş
-#}
+{% extends "layout.html" %}
 
-{#
-Listeler
-1- Aktif Task
-2- Bitmiş Tasklar
-3- İptal Tasklar
-#}
+{% block title%}
+Task
+{% endblock title%}
 
-{#
- 
+{% block body %}
 
-#}
+{% from "includes/_formhelpers.html" import render_field %}
 
-<div>PATATES</div>
+<form method=post>
+
+{{ render_field(form.taskname) }}
+{{ render_field(form.taskstate) }}
+{{ render_field(form.taskduration) }}
+{{ render_field(form.taskstart) }}
+{{ render_field(form.taskend) }}
+
+<input class="btn btn-primary btn-block" type="submit" value="Görev Oluştur" />
+
+</form>
+
+{% for task in activeTasks %}
+
+<p>{{task.taskname}}</p>
+
+{% endfor %}
+
+{% endblock body %}

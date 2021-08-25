@@ -133,7 +133,7 @@ def register():
 
 
 @app.route("/tasks", methods=["GET", "POST"])
-def task():
+def tasks():
     form = TaskForm(request.form)
 
     if request.method == "POST":
@@ -143,9 +143,10 @@ def task():
         # taskstart = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
         taskstate = form.taskstate.data
         taskend = form.taskend.data
+        uuid = uuid4().hex
 
         task = Task(taskname=taskname, taskduration=taskduration,
-                    taskstart=taskstart, taskstate=taskstate, taskend=taskend)
+                    taskstart=taskstart, taskstate=taskstate, taskend=taskend, uuid=uuid)
 
         task.save()
 
@@ -154,15 +155,14 @@ def task():
     else:
         tasks = list(Task.objects.all())
         activeTasks = []
-        finishedTasks =[]
+        finishedTasks = []
         canceledTasks = []
 
         for task in tasks:
             if task.taskstate == "Aktif":
                 activeTasks.append(task)
 
-
-        return render_template("tasks.html", form=form, tasks=tasks)
+        return render_template("tasks.html", form=form, tasks=tasks, activeTasks=activeTasks)
 
 
 @app.route("/delete/<id>", methods=["GET"])
