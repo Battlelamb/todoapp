@@ -165,12 +165,28 @@ def tasks():
         return render_template("tasks.html", form=form, tasks=tasks, activeTasks=activeTasks)
 
 
-@app.route("/delete/<id>", methods=["GET"])
+@app.route("/delete-task/<id>", methods=["GET"])
+def delete_task(id):
+    try:
+        task = Task.objects(uuid=str(id)).delete()
+        if(task):
+            print("Görev başarı ile silindi")
+            return redirect(url_for("tasks"))
+        else:
+            print("Bir sorun oluştu")
+
+    except Exception as ex:
+        print("((((", ex, "))))")
+
+    return redirect(url_for("tasks"))
+
+
+@app.route("/delete-user/<id>", methods=["GET"])
 def delete_user(id):
     try:
         # print("ID: ", id)
         # user = User.objects(uuid=str(id)).first()
-        usermuser = User.objects.get_or_404(uuid=str(id))
+        # usermuser = User.objects.get_or_404(uuid=str(id))
         # body = jsonify(usermuser)
         # print("Body", body)
 
@@ -182,9 +198,9 @@ def delete_user(id):
         # }
         # usermuser.save(firstname="pato")
 
-        patos = usermuser.update(firstname="pato")
+        # patos = usermuser.update(firstname="pato")
 
-        print("PATOS", patos)
+        # print("PATOS", patos)
 
         # for i in usermuser:
         #     print(i, ":", usermuser[i])
@@ -193,14 +209,14 @@ def delete_user(id):
 
         # patos = usermuser.update(**{"firstname":"pato"})
 
-        print("Muer:", usermuser.firstname)
+        # print("Muer:", usermuser.firstname)
         # print("PATOS", patos)
-        if(usermuser):
-            # patos = usermuser.update(firstname="pato")
-            # print("PATOS", patos)
-            # usermuser.firstname = "pato"
-            # usermuser.save()
-            return redirect(url_for("register"))
+        # if(usermuser):
+        # patos = usermuser.update(firstname="pato")
+        # print("PATOS", patos)
+        # usermuser.firstname = "pato"
+        # usermuser.save()
+        # return redirect(url_for("register"))
 
         # 0 veya 1 döndürüyor # 0 == false, 1 == true
         user = User.objects(uuid=str(id)).delete()

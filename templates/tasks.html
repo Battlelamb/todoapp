@@ -23,7 +23,7 @@ Task
 {% for task in activeTasks %}
 
 <p>{{task.taskname}}</p>
-
+<a class="btn btn-danger" href="/delete-task/{{task.uuid}}">Sil</a>
 {% endfor %}
 
 {% endblock body %}
