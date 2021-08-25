@@ -1,5 +1,5 @@
-{% extends "layout.html" %} {% block title %} Register {% endblock title %} {%
-block body %} {% from "includes/_formhelpers.html" import render_field %}
+{% extends "layout.html" %} {% block title %} Register {% endblock title %} 
+{% block body %} {% from "includes/_formhelpers.html" import render_field %}
 
 <form method="post">
   <dl>
@@ -7,7 +7,7 @@ block body %} {% from "includes/_formhelpers.html" import render_field %}
     render_field(form.adres) }}
   </dl>
   <p>
-    <input type="submit" value="Kayıt Ol" />
+    <input class="btn btn-primary btn-block" type="submit" value="Kayıt Ol" />
   </p>
 </form>
 
@@ -16,7 +16,9 @@ block body %} {% from "includes/_formhelpers.html" import render_field %}
 <table class="table table-striped">
   <thead>
     <tr>
+      {#
       <th scope="col">ID</th>
+      #}
       <th scope="col">First Name</th>
       <th scope="col">Last Name</th>
       <th scope="col">Adres</th>
@@ -26,7 +28,9 @@ block body %} {% from "includes/_formhelpers.html" import render_field %}
   <tbody>
     {% for user in users %}
     <tr>
+      {#
       <td>{{ user.uuid }}</td>
+      #}
       <td>{{ user.firstname }}</td>
       {% if user.lastname == "" %}
       <td>Kullanıcı Girmemiş</td>
@@ -39,7 +43,9 @@ block body %} {% from "includes/_formhelpers.html" import render_field %}
       {% else %}
       <td>{{ user.adres }}</td>
       {% endif %}
-      <td><a href="/delete/{{user.uuid}}">Sil</a></td>
+      <td>
+        <a class="btn btn-danger" href="/delete/{{user.uuid}}">Sil</a>
+      </td>
     </tr>
     {% endfor %}
   </tbody>

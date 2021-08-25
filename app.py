@@ -1,8 +1,10 @@
-from flask import Flask, render_template, redirect, url_for
+from typing import Optional
+from flask import Flask, render_template, redirect, url_for, jsonify
 from flask.globals import request
-from wtforms import Form, StringField, validators
+from wtforms import Form, StringField, validators, DateField
 from flask_mongoengine import MongoEngine
 from uuid import uuid4
+from datetime import date, datetime
 
 app = Flask(__name__)
 
@@ -15,6 +17,8 @@ app.config['MONGODB_SETTINGS'] = {
 
 db = MongoEngine()
 db.init_app(app)
+
+# Kullanıcı Sınıfı
 
 
 class User(db.Document):
@@ -31,7 +35,29 @@ class User(db.Document):
             "firstname": self.firstname,
             "lastname": self.lastname,
             "adres": self.adres
+        }  # json Object
+
+
+# class Task
+class Task(db.Document):
+    uuid = db.StringField()
+    taskname = db.StringField()
+    taskduration = db.StringField()
+    taskstate = db.StringField()
+    taskstart = db.StringField()
+    taskend = db.StringField()
+
+    def to_json(self):
+        return {
+            "uuid": self.uuid,
+            "taskname": self.taskname,
+            "taskduration": self.taskduration,
+            "taskstate": self.taskstate,
+            "taskstart": self.taskstart,
+            "taskend": self.taskend
         }
+
+# Kayıt Formu
 
 
 class RegisterForm(Form):
@@ -39,6 +65,19 @@ class RegisterForm(Form):
                             validators.input_required()])
     lastname = StringField(u"Last Name", validators=[validators.optional()])
     adres = StringField(u'Adres', validators=[validators.optional()])
+
+
+# Task Formu
+class TaskForm(Form):
+    taskname = StringField(u'Task Name', validators=[
+                           validators.input_required()])
+    taskduration = StringField(u'Task Duration', validators=[
+                               validators.optional()])
+    taskstart = StringField(u'Task Start Date', validators=[
+                            validators.input_required()], default=datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+    taskstate = StringField(u'Task State', validators=[
+                            validators.optional()], default="Aktif")
+    taskend = StringField(u'Task End Date', validators=[validators.optional()])
 
 
 @app.route("/")  # => http://127.0.0.1:5000/ = https://www.hepsiburada.com/
@@ -73,12 +112,12 @@ def register():
     if request.method == "POST":  # Sunucuya Gönderme İşlemi
 
         firstname = form.firstname.data  # data == text == değeri
-        uuid = uuid4().hex
         lastname = form.lastname.data
         adres = form.adres.data
+        uuid = uuid4().hex
 
-        # print(form.firstname.data)
-        # print(form.lastname.data)
+        # now_time = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # taskcreatedate = now_time
 
         user = User(firstname=firstname, lastname=lastname,
                     adres=adres, uuid=uuid)
@@ -86,33 +125,93 @@ def register():
 
         return redirect(url_for("register"))
     else:
-        users = list(User.objects)
-        # for x in users:
-        #     print(x.firstname)
+        users = list(User.objects.all())
+
         return render_template("register.html", form=form, users=users)
+
+# /tasksave, /tasks, /addtask, /taskadd
+
+
+@app.route("/tasks", methods=["GET", "POST"])
+def task():
+    form = TaskForm(request.form)
+
+    if request.method == "POST":
+        taskname = form.taskname.data
+        taskduration = form.taskduration.data
+        taskstart = form.taskstart.data
+        # taskstart = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        taskstate = form.taskstate.data
+        taskend = form.taskend.data
+
+        task = Task(taskname=taskname, taskduration=taskduration,
+                    taskstart=taskstart, taskstate=taskstate, taskend=taskend)
+
+        task.save()
+
+        return redirect(url_for("tasks"))
+
+    else:
+        tasks = list(Task.objects.all())
+        activeTasks = []
+        finishedTasks =[]
+        canceledTasks = []
+
+        for task in tasks:
+            if task.taskstate == "Aktif":
+                activeTasks.append(task)
+
+
+        return render_template("tasks.html", form=form, tasks=tasks)
 
 
 @app.route("/delete/<id>", methods=["GET"])
 def delete_user(id):
     try:
-        print(User)
-        print("ID: ", id)
+        # print("ID: ", id)
         # user = User.objects(uuid=str(id)).first()
+        usermuser = User.objects.get_or_404(uuid=str(id))
+        # body = jsonify(usermuser)
+        # print("Body", body)
+
+        # for i in usermuser:
+        #     print(i, ":", usermuser[i])
+
+        # someObjectWithNewData = {
+        #     "firstname": "pato", "lastname": usermuser.lastname, "uuid": usermuser.uuid, "adres": usermuser.adres
+        # }
+        # usermuser.save(firstname="pato")
+
+        patos = usermuser.update(firstname="pato")
+
+        print("PATOS", patos)
+
+        # for i in usermuser:
+        #     print(i, ":", usermuser[i])
+
+        # usermuser.firstname = "pato"
+
+        # patos = usermuser.update(**{"firstname":"pato"})
+
+        print("Muer:", usermuser.firstname)
+        # print("PATOS", patos)
+        if(usermuser):
+            # patos = usermuser.update(firstname="pato")
+            # print("PATOS", patos)
+            # usermuser.firstname = "pato"
+            # usermuser.save()
+            return redirect(url_for("register"))
+
+        # 0 veya 1 döndürüyor # 0 == false, 1 == true
         user = User.objects(uuid=str(id)).delete()
-        # user.delete()
-        print(user)
-        # users = list(User.objects)
-        # for x in users:
-        #     print(x.firstname)
-        # try:
-        #     user.delete()
-        # except Exception as ex:
-        #     print("****", ex, "****")
-        if not user:
-            print("yok artık")
+
+        if(user):
+            print("Tamamdır, kullanıcı silindi")
         else:
-            user.delete()
+            print("Silme sırasında bir hata oluştu.")
+
     except Exception as ex:
+        # ex Örnekleri => 1- Sunucu ile bağlantı kurulamadı 2- Versiyon uyuşmazlığı 3- hatalı kayıt
         print("((((", ex, "))))")
 
     return redirect(url_for("register"))
