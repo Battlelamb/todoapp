@@ -51,6 +51,7 @@ class Task(db.Document):
         return {
             "uuid": self.uuid,
             "taskname": self.taskname,
+            # Json objelerinde boşluk bırakmadan camelcase veya alttan çizgi ile ayırabiliriz
             "taskduration": self.taskduration,
             "taskstate": self.taskstate,
             "taskstart": self.taskstart,
@@ -161,8 +162,14 @@ def tasks():
         for task in tasks:
             if task.taskstate == "Aktif":
                 activeTasks.append(task)
+        for task in tasks:
+            if task.taskstate == "Pasif":
+                canceledTasks.append(task)
+        for task in tasks:
+            if task.taskstate == "Done":
+                finishedTasks.append(task)
 
-        return render_template("tasks.html", form=form, tasks=tasks, activeTasks=activeTasks)
+        return render_template("tasks.html", form=form, tasks=tasks, activeTasks=activeTasks, canceledTasks=canceledTasks)
 
 
 @app.route("/delete-task/<id>", methods=["GET"])
@@ -179,6 +186,19 @@ def delete_task(id):
         print("((((", ex, "))))")
 
     return redirect(url_for("tasks"))
+
+
+@app.route("/passive-task/<id>", methods=["GET"])
+def passive_task(id):
+    try:
+        task = Task.objects(uuid=str(id)).update(taskstate="Pasif")
+        if(task):
+            print("Görev başarı ile pasif yapıldı")
+            return redirect(url_for("tasks"))
+        else:
+            print("Bir sorun oluştu")
+    except Exception as ex:
+        print("((((", ex, "))))")
 
 
 @app.route("/delete-user/<id>", methods=["GET"])

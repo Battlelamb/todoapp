@@ -2,7 +2,9 @@
 <div class="form-group">
   <label>{{ field.label }}</label>
 
-  {{ field(class="form-control", **kwargs)|safe }} {% if field.errors %}
+  {{ field(class="form-control", **kwargs)|safe }} 
+  
+  {% if field.errors %}
   <ul class="errors">
     {% for erorr in field.errors %}
     <li>{{erorr}}</li>

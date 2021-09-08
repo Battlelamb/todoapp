@@ -1,29 +1,86 @@
-{% extends "layout.html" %}
+{% extends "layout.html" %} {% block title%} Task {% endblock title%} {% block
+body %} {% from "includes/_formhelpers.html" import render_field %}
 
-{% block title%}
-Task
-{% endblock title%}
+<form method="post">
+  {{ render_field(form.taskname) }} {{ render_field(form.taskstate) }} {{
+  render_field(form.taskduration) }} {{ render_field(form.taskstart) }} {{
+  render_field(form.taskend) }}
 
-{% block body %}
-
-{% from "includes/_formhelpers.html" import render_field %}
-
-<form method=post>
-
-{{ render_field(form.taskname) }}
-{{ render_field(form.taskstate) }}
-{{ render_field(form.taskduration) }}
-{{ render_field(form.taskstart) }}
-{{ render_field(form.taskend) }}
-
-<input class="btn btn-primary btn-block" type="submit" value="Görev Oluştur" />
-
+  <input
+    class="btn btn-primary btn-block"
+    type="submit"
+    value="Görev Oluştur"
+  />
 </form>
 
-{% for task in activeTasks %}
+<br />
 
-<p>{{task.taskname}}</p>
-<a class="btn btn-danger" href="/delete-task/{{task.uuid}}">Sil</a>
-{% endfor %}
+<h3>Active Tasks</h3>
+<table class="table table-striped table-sm">
+  <thead>
+    <tr>
+      <th scope="col">Task Name</th>
+      <th scope="col">Task State</th>
+      <th scope="col">Task Duration</th>
+      <th scope="col">Task Start</th>
+      <th scope="col">Task End</th>
+      <th scope="col">Sil</th>
+      <th scope="col">İptal</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for task in activeTasks %}
+    <tr>
+      <td>{{ task.taskname }}</td>
+      <td>{{ task.taskstate }}</td>
+      <td>{{ task.taskduration }}</td>
+      <td>{{ task.taskstart }}</td>
+      <td>{{ task.taskend }}</td>
+      <td>
+        <a class="btn btn-danger" href="/delete-task/{{task.uuid}}">Sil</a>
+      </td>
+      <td>
+        <a class="btn btn-danger" href="/passive-task/{{task.uuid}}">İptal</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<br />
+
+<h3>Pasive Tasks</h3>
+<table class="table table-striped table-sm">
+  <thead>
+    <tr>
+      <th scope="col">Task Name</th>
+      <th scope="col">Task State</th>
+      <th scope="col">Task Duration</th>
+      <th scope="col">Task Start</th>
+      <th scope="col">Task End</th>
+      <th scope="col">Sil</th>
+      <th scope="col">İptal</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for task in canceledTasks %}
+    <tr>
+      <td>{{ task.taskname }}</td>
+      <td>{{ task.taskstate }}</td>
+      <td>{{ task.taskduration }}</td>
+      <td>{{ task.taskstart }}</td>
+      <td>{{ task.taskend }}</td>
+      <td>
+        <a class="btn btn-danger" href="/delete-task/{{task.uuid}}">Sil</a>
+      </td>
+      <td>
+        <a class="btn btn-danger" href="/passive-task/{{task.uuid}}">İptal</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock body %}
