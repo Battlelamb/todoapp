@@ -1,7 +1,7 @@
 from typing import Optional
 from flask import Flask, render_template, redirect, url_for, jsonify
 from flask.globals import request
-from wtforms import Form, StringField, validators, DateField
+from wtforms import Form, StringField, validators, DateField, SelectField
 from flask_mongoengine import MongoEngine
 from uuid import uuid4
 from datetime import date, datetime
@@ -17,6 +17,8 @@ app.config['MONGODB_SETTINGS'] = {
 
 db = MongoEngine()
 db.init_app(app)
+
+# dateTimeFormat = "%m/%d/%Y"
 
 # Kullanıcı Sınıfı
 
@@ -74,10 +76,14 @@ class TaskForm(Form):
                            validators.input_required()])
     taskduration = StringField(u'Task Duration', validators=[
                                validators.optional()])
-    taskstart = StringField(u'Task Start Date', validators=[
-                            validators.input_required()], default=datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
-    taskstate = StringField(u'Task State', validators=[
-                            validators.optional()], default="Aktif")
+    taskstart = DateField(u'Task Start Date', format="%d/%m/%Y", validators=[
+        validators.input_required()])
+    taskstate = SelectField(
+        u'Task State',
+        choices=[("Aktif", "Aktif"), ("Pasif", "Pasif"), ("Bitti", "Bitti")],
+        validators=[validators.optional()],
+        default="Aktif"
+    )
     taskend = StringField(u'Task End Date', validators=[validators.optional()])
 
 
@@ -140,11 +146,16 @@ def tasks():
     if request.method == "POST":
         taskname = form.taskname.data
         taskduration = form.taskduration.data
-        taskstart = form.taskstart.data
+        # taskstart = form.taskstart.data
         # taskstart = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
         taskstate = form.taskstate.data
         taskend = form.taskend.data
         uuid = uuid4().hex
+
+        if(form.taskstart.data == ""):
+            taskstart = datetime.now().strftime("%d/%m/%Y")
+        else:
+            taskstart = form.taskstart.data.strftime("%d/%m/%Y")
 
         task = Task(taskname=taskname, taskduration=taskduration,
                     taskstart=taskstart, taskstate=taskstate, taskend=taskend, uuid=uuid)

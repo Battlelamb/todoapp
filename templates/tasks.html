@@ -1,9 +1,19 @@
 {% extends "layout.html" %} {% block title%} Task {% endblock title%} {% block
 body %} {% from "includes/_formhelpers.html" import render_field %}
 
-<form method="post">
-  {{ render_field(form.taskname) }} {{ render_field(form.taskstate) }} {{
-  render_field(form.taskduration) }} {{ render_field(form.taskstart) }} {{
+<form method="post" autocomplete="off">
+
+  {{ render_field(form.taskname) }} 
+  
+  {{ render_field(form.taskstate) }}
+
+
+
+
+   {{  render_field(form.taskduration) }}
+
+  <label>Task Start</label>
+  {{ form.taskstart(class="form-control datepicker") }} {{
   render_field(form.taskend) }}
 
   <input
@@ -16,7 +26,7 @@ body %} {% from "includes/_formhelpers.html" import render_field %}
 <br />
 
 <h3>Active Tasks</h3>
-<table class="table table-striped table-sm">
+<table id="table-test" class="table table-striped table-sm">
   <thead>
     <tr>
       <th scope="col">Task Name</th>
