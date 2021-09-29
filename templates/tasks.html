@@ -2,15 +2,8 @@
 body %} {% from "includes/_formhelpers.html" import render_field %}
 
 <form method="post" autocomplete="off">
-
-  {{ render_field(form.taskname) }} 
-  
-  {{ render_field(form.taskstate) }}
-
-
-
-
-   {{  render_field(form.taskduration) }}
+  {{ render_field(form.taskname) }} {{ render_field(form.taskstate) }} {{
+  render_field(form.taskduration) }}
 
   <label>Task Start</label>
   {{ form.taskstart(class="form-control datepicker") }} {{
@@ -90,6 +83,35 @@ body %} {% from "includes/_formhelpers.html" import render_field %}
       </td>
     </tr>
     {% endfor %}
+  </tbody>
+</table>
+
+<h3>Bitmiş Taks</h3>
+<table class="table table-striped table-sm">
+  <thead>
+    <tr>
+      <th scope="col">Task Name</th>
+      <th scope="col">Task State</th>
+      <th scope="col">Task Duration</th>
+      <th scope="col">Task Start</th>
+      <th scope="col">Task End</th>
+      <th scope="col">Sil</th>
+      <th scope="col">İptal</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {%for task in finishedTasks%} {# tr = TABLE ROW #}
+    <tr>
+      <td>{{task.taskname}}</td>
+      <td>{{task.taskstate}}</td>
+      <td>{{task.taskduration}}</td>
+      <td>{{task.taskstart}}</td>
+      <td>{{task.taskend}}</td>
+      <td>button</td>
+      <td>button</td>
+    </tr>
+    {%endfor%}
   </tbody>
 </table>
 
